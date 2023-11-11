@@ -1,6 +1,10 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
+function getFileExtension(filename) {
+  return filename.split('.').pop().toLowerCase();
+}
+
 export default class NewBill {
   constructor({ document, onNavigate, store, localStorage }) {
     this.document = document
@@ -17,11 +21,20 @@ export default class NewBill {
   }
   handleChangeFile = e => {
     e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`)
+    const file = fileInput.files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
+
+    var allowedExtensions = ['jpg', 'jpeg', 'png'];
+    var fileExtension = getFileExtension(fileName);
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert('Seuls les fichiers JPG, JPEG et PNG sont autorisés.');
+      fileInput.value = '';
+    }
     formData.append('file', file)
     formData.append('email', email)
 
